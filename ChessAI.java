@@ -14,7 +14,7 @@ public abstract class ChessAI {
     public ChessAI() {
     }
     public static int[] aiMiniMax(int[][] PARAMETER_ARRAY, int side, int searchDepth){
-    	int[][] arr=ArrayOps.copyArr(PARAMETER_ARRAY);
+    	int[][] arr=ArrayOps.copyArr8(PARAMETER_ARRAY);
     	if (testGameOver(arr)||searchDepth==0){
     		int[] out={-1,-1,-1,-1,getScore(arr)};
     		return out;
@@ -32,7 +32,7 @@ public abstract class ChessAI {
         					if(legalMoveBoard[a][b]==1){
         						int[] moveItem = {i,j,a,b};
         						moves.add(moveItem);
-        						int[][] recurArr = ArrayOps.copyArr(arr);
+        						int[][] recurArr = ArrayOps.copyArr8(arr);
         						recurArr=makeMove(moveItem,recurArr);
         						if(side==1){
 						    		scores.add(aiMiniMax(recurArr,2,searchDepth-1)[4]);
@@ -102,12 +102,12 @@ public abstract class ChessAI {
 		}
     }
     private static int getMoveScore(int[] move, int[][] PARAMETER_ARRAY){
-    	int[][] arr = ArrayOps.copyArr(PARAMETER_ARRAY);
+    	int[][] arr = ArrayOps.copyArr8(PARAMETER_ARRAY);
     	arr=makeMove(move, arr);
     	return getScore(arr);
     }
     private static int getScore(int[][] PARAMETER_ARRAY){
-    	int [][] arr = ArrayOps.copyArr(PARAMETER_ARRAY);
+    	int [][] arr = ArrayOps.copyArr8(PARAMETER_ARRAY);
         double fitness=0;
         for(int[] foo: arr){
         	for(int bar:foo){
@@ -145,16 +145,16 @@ public abstract class ChessAI {
     }
     
     private static int[][] legalMoves(int r, int c, int[][] tempArr){
-    	int[][] inArr = ArrayOps.copyArr(tempArr);
+    	int[][] inArr = ArrayOps.copyArr8(tempArr);
     	int[][] out = ChessOps.pseudoLegalMoves(r,c,inArr,ENPASSANT_ENABLED);
 		if(CASTLING_ENABLED){
 			//WHITE CASTLE KINGSIDE
 			if(inArr[r][c]==19&&inArr[7][5]==0&&inArr[7][6]==0&&inArr[7][7]==18){ 
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
 					tempArrMove=makeMove(7,4,7,5,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						tempArrMove2=makeMove(7,4,7,6,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,1,ENPASSANT_ENABLED)){
 							out[7][6]=2;
@@ -165,11 +165,11 @@ public abstract class ChessAI {
 			
 			//BLACK CASTLE KINGSIDE
 			if(inArr[r][c]==29&&inArr[0][5]==0&&inArr[0][6]==0&&inArr[0][7]==28){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
 					tempArrMove=makeMove(0,4,0,5,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						tempArrMove2=makeMove(0,4,0,6,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,2,ENPASSANT_ENABLED)){
 							out[0][6]=3;
@@ -180,14 +180,14 @@ public abstract class ChessAI {
 			
 			//WHITE CASTLE QUEENSIDE
 			if(inArr[r][c]==19&&inArr[7][3]==0&&inArr[7][2]==0&&inArr[7][1]==0&&inArr[7][0]==18){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
 					tempArrMove=makeMove(7,4,7,3,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						tempArrMove2=makeMove(7,4,7,2,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,1,ENPASSANT_ENABLED)){
-							int[][] tempArrMove3 = ArrayOps.copyArr(inArr);
+							int[][] tempArrMove3 = ArrayOps.copyArr8(inArr);
 							tempArrMove3=makeMove(7,4,7,1,tempArrMove3);
 							if (!ChessOps.kingChecked(tempArrMove3,1,ENPASSANT_ENABLED)){
 								out[7][2]=4;
@@ -199,14 +199,14 @@ public abstract class ChessAI {
 			
 			//BLACK CASTLE QUEENSIDE
 			if(inArr[r][c]==29&&inArr[0][3]==0&&inArr[0][2]==0&&inArr[0][1]==0&&inArr[0][0]==28){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
 					tempArrMove=makeMove(0,4,0,3,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						tempArrMove2=makeMove(0,4,0,2,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,2,ENPASSANT_ENABLED)){
-							int[][] tempArrMove3 = ArrayOps.copyArr(inArr);
+							int[][] tempArrMove3 = ArrayOps.copyArr8(inArr);
 							tempArrMove3=makeMove(0,4,0,1,tempArrMove3);
 							if (!ChessOps.kingChecked(tempArrMove3,2,ENPASSANT_ENABLED)){
 								out[0][2]=5;
@@ -219,7 +219,7 @@ public abstract class ChessAI {
     	for(int i=0; i<8; i++){
         	for(int j=0; j<8; j++){
         		if(out[i][j]==1){
-        			int[][] tempArrMove = ArrayOps.copyArr(inArr);
+        			int[][] tempArrMove = ArrayOps.copyArr8(inArr);
         			tempArrMove=makeMove(r,c,i,j,tempArrMove);
         			if (ChessOps.kingChecked(tempArrMove,(inArr[r][c]/10),ENPASSANT_ENABLED)){
         				out[i][j]=0;
@@ -230,7 +230,7 @@ public abstract class ChessAI {
     	return out;
     }
     private static int[][] makeMove(int[] moveArr, int[][] inArr){
-    	int [][] boardArr=ArrayOps.copyArr(inArr);
+    	int [][] boardArr=ArrayOps.copyArr8(inArr);
     	boardArr[moveArr[2]][moveArr[3]] = boardArr[moveArr[0]][moveArr[1]];
     	boardArr[moveArr[0]][moveArr[1]]=0;
     	if(boardArr[moveArr[2]][moveArr[3]]==11&&moveArr[2]==0){
@@ -286,7 +286,7 @@ public abstract class ChessAI {
     	return boardArr;
     }
     private static int[][] makeMove(int i1 ,int j1 ,int i2 ,int j2 , int[][] inArr){
-    	int[][] boardArr=ArrayOps.copyArr(inArr);
+    	int[][] boardArr=ArrayOps.copyArr8(inArr);
     	boardArr[i2][j2] = boardArr[i1][j1];
     	boardArr[i1][j1] = 0;
     	if(boardArr[i2][j2]==11&&i2==0){
