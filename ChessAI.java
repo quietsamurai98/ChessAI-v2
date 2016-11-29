@@ -17,7 +17,7 @@ public abstract class ChessAI {
     	int[][] arr=ArrayOps.copyArr8(PARAMETER_ARRAY);
     	//System.out.print("N");
     	if (testGameOver(arr)||searchDepth==0){
-    		System.out.print("L");
+    		//System.out.print("L");
     		int[] out={-1,-1,-1,-1,getScore(arr)};
     		return out;
     	}
