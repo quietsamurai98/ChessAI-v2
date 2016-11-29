@@ -60,8 +60,8 @@ public class ChessGUI{
 	int turnCount=1;
 	boolean printTurn = true;
     static final int StandardBoard[][] = {
-			{28,22,23,25,29,23,22,28},
-			{21,21,21,21,21,21,21,21},
+			{28,22,23,25,29,23*0,22*0,28},
+			{21,21,21,21,21,21*0,21,21},
 			{00,00,00,00,00,00,00,00},
 			{00,00,00,00,00,00,00,00},
 			{00,00,00,00,00,00,00,00},
@@ -89,6 +89,19 @@ public class ChessGUI{
 			{11,11,11,11,11,00,00,11},
 			{18,12,13,15,19,13,12,18}
 		};
+		
+		
+	static final int enpassant_testing[][] = {
+			{28,22,23,25,29,23,22,28},
+			{21,21,00,21,00,21,21,21},
+			{00,00,21,00,00,00,00,00},
+			{00,00,11,00,00,00,00,00},
+			{00,00,00,00,21,00,00,00},
+			{00,00,00,00,11,00,00,00},
+			{11,11,00,11,00,11,11,11},
+			{18,12,13,15,19,13,12,18}
+	};
+	
 	private static boolean ENPASSANT_ENABLED = true;
 	private static boolean CASTLING_ENABLED = true;
 	
@@ -97,7 +110,7 @@ public class ChessGUI{
 	
 	
     public static void main(String[] args) {
-        ChessGUI gui=new ChessGUI(false,true);
+        ChessGUI gui=new ChessGUI(false,false);
     }
     public ChessGUI(boolean whiteIsAI, boolean blackIsAI) {
     	currentSide=3;
@@ -618,14 +631,14 @@ public class ChessGUI{
     	
     	if(boardArr[i2][j2]==11&&i1==6&&i2==4){
     		boardArr[i2][j2]=17;
-    	} else if(boardArr[i2][j2]==21&&i1==1&&i2==5){
-    		boardArr[i2][j2]=17;
+    	} else if(boardArr[i2][j2]==21&&i1==1&&i2==3){
+    		boardArr[i2][j2]=27;
     	}
-    	if(boardArr[i2][j2]==11&&j1-j2!=0&&boardArr[i2+1][j2]%10==7){
+    	if(boardArr[i2][j2]==11&&j1-j2!=0&&!captureBool){//boardArr[i2+1][j2]%10==7){
     		boardArr[i2+1][j2]=0;
     		//moveStr+="e.p.";
     	}
-    	if(boardArr[i2][j2]==21&&j1-j2!=0&&boardArr[i2+1][j2]%10==7){
+    	if(boardArr[i2][j2]==21&&j1-j2!=0&&!captureBool){//boardArr[i2+1][j2]%10==7){
     		boardArr[i2-1][j2]=0;
     		//moveStr+="e.p.";
     	}
@@ -646,5 +659,6 @@ public class ChessGUI{
     		turnCount++;
     		turnStr="";
     	}
+    	//ArrayOps.print8x8(board);
     }
 }

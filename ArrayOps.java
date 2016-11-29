@@ -33,6 +33,20 @@ public abstract class ArrayOps {
     	}
     	return foo;
     }
+    
+    public static void print8x8(int[][] PARAMETER_ARRAY){
+    	System.out.println();
+    	for(int r=0; r<8; r++){
+    		for(int c=0; c<8; c++){
+    			if(PARAMETER_ARRAY[r][c]==0){
+    				System.out.print("0");
+    			}
+    			System.out.print(PARAMETER_ARRAY[r][c]+",");
+    		}
+    		System.out.println();
+    	}
+    }
+    
     public static int[][] multiplyArrayElements(int[][] foo, int[][] bar){
     	for(int i=0; i<8; i++){
         	for(int j=0; j<8; j++){

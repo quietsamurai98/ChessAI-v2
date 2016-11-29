@@ -41,18 +41,18 @@ public class ChessOps {
 			}
 			if(ENPASSANT_ENABLED){
 				if(side==1&&r==3){
-					if (c>0&&inArr[3][c-1]==27&&out[2][c-1]==0){ //If row to left exists AND square to left is enemy Pawn7 AND target is empty (failsafe)
+					if (c>0&&inArr[3][c-1]==27&&inArr[2][c-1]==0){ //If row to left exists AND square to left is enemy Pawn7 AND target is empty (failsafe)
 						out[2][c-1]=1;
 					}
-					if (c<7&&inArr[3][c+1]==27&&out[2][c+1]==0){
+					if (c<7&&inArr[3][c+1]==27&&inArr[2][c+1]==0){
 						out[2][c+1]=1;
 					}
 				}
 				if(side==2&&r==4){
-					if (c>0&&inArr[4][c-1]==17&&out[5][c-1]==0){
+					if (c>0&&inArr[4][c-1]==17&&inArr[5][c-1]==0){
 						out[5][c-1]=1;
 					}
-					if (c<7&&inArr[4][c+1]==17&&out[5][c+1]==0){
+					if (c<7&&inArr[4][c+1]==17&&inArr[5][c+1]==0){
 						out[5][c+1]=1;
 					}
 				}
