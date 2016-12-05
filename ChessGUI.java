@@ -13,10 +13,6 @@
  *	CRITICAL - Game breaking issues, and bugs that cause crashes, memory leaks, unintended CPU hogging, etc.
  *	
  *	HIGH PRIORITY - Missing features that the average user would expect, and non game-breaking bugs
- *		Add a text notification when the user makes a move that ends the game.
- *			Currently, if the AI ends the game, it will print it out
- *		Change move text output format to algebraic notation
- *			Currently, output format is "Piece on (r,c) moves to (r',c')"
  *
  *TODO (Internal)
  *	Refactor the code, aiming to improve the following, in order of importance:
@@ -25,6 +21,7 @@
  *		Code complexity
  *		
  */
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -93,6 +90,19 @@ public class ChessGUI{
 			{11,11,11,11,11,00,00,11},
 			{18,12,13,15,19,13,12,18}
 		};
+		
+		
+	static final int enpassant_testing[][] = {
+			{28,22,23,25,29,23,22,28},
+			{21,21,00,21,00,21,21,21},
+			{00,00,21,00,00,00,00,00},
+			{00,00,11,00,00,00,00,00},
+			{00,00,00,00,21,00,00,00},
+			{00,00,00,00,11,00,00,00},
+			{11,11,00,11,00,11,11,11},
+			{18,12,13,15,19,13,12,18}
+	};
+	
 	private static boolean ENPASSANT_ENABLED = true;
 	private static boolean CASTLING_ENABLED = true;
 	
@@ -141,7 +151,7 @@ public class ChessGUI{
     }
     private void makeGUI(){
     	chessInterface = new JFrame();
-        chessInterface.setTitle("Chess Interface");
+        chessInterface.setTitle("CANICVS Chess Engine v2");
         
         chessInterface.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         chessInterface.setFocusable(true);
@@ -266,10 +276,17 @@ public class ChessGUI{
         chessInterface.add(newGameButtons,c);
         
 		chessInterface.setResizable(false);
+		
+		try{
+			chessInterface.setIconImage(ImageIO.read(this.getClass().getResource("icon.png")));
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
+		
         chessInterface.pack();
-        chessInterface.setVisible(true);
+
         board=new int[8][8];
-        board = ArrayOps.copyArr(reset);
+        board = ArrayOps.copyArr8(reset);
         if(!WHITE_AI&&BLACK_AI){
         	guiPrintLine("Welcome! You are currently playing as white against an AI playing as black.");
         	guiPrintLine("Click on one of the buttons to start a new game with the specified players.");
@@ -296,6 +313,10 @@ public class ChessGUI{
         updatePieceDisplay();
         textScroll.paintImmediately(new Rectangle(new Point(0,0),textScroll.getSize()));
         newGameButtons.paintImmediately(new Rectangle(new Point(0,0),newGameButtons.getSize()));
+        
+        
+        
+        chessInterface.setVisible(true);
     }
     private void loadImages(){
     	try{
@@ -339,6 +360,15 @@ public class ChessGUI{
 				    highlightMoves(new int[8][8]);
 		    		updatePieceDisplay();
 		    		currentSide=currentSide%2+1;
+		    		if(ChessAI.aiMiniMax(board,1,1)[3]==-1){
+		    			guiPrintLine("Black wins!");
+		    			checkmate=true;
+		    		}
+		    		if(ChessAI.aiMiniMax(board,2,1)[3]==-1){
+		    			guiPrintLine("White wins!");
+		    			checkmate=true;
+		    		}
+		    		
 		    		
 		    		if(WHITE_AI||BLACK_AI){
 			    		int[] coords = ChessAI.aiMiniMax(board,currentSide,depth);
@@ -467,16 +497,16 @@ public class ChessGUI{
         }
     }
     private int[][] legalMoves(int r, int c, int[][] tempArr){
-		int[][] inArr = ArrayOps.copyArr(tempArr);
+		int[][] inArr = ArrayOps.copyArr8(tempArr);
     	int[][] out = ChessOps.pseudoLegalMoves(r,c,inArr,ENPASSANT_ENABLED);
 		if(CASTLING_ENABLED){
 			//WHITE CASTLE KINGSIDE
 			if(inArr[r][c]==19&&inArr[7][5]==0&&inArr[7][6]==0&&inArr[7][7]==18){ 
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
 					makeMove(7,4,7,5,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						makeMove(7,4,7,6,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,1,ENPASSANT_ENABLED)){
 							out[7][6]=2;
@@ -487,11 +517,11 @@ public class ChessGUI{
 			
 			//BLACK CASTLE KINGSIDE
 			if(inArr[r][c]==29&&inArr[0][5]==0&&inArr[0][6]==0&&inArr[0][7]==28){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
 					makeMove(0,4,0,5,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						makeMove(0,4,0,6,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,2,ENPASSANT_ENABLED)){
 							out[0][6]=3;
@@ -502,14 +532,14 @@ public class ChessGUI{
 			
 			//WHITE CASTLE QUEENSIDE
 			if(inArr[r][c]==19&&inArr[7][3]==0&&inArr[7][2]==0&&inArr[7][1]==0&&inArr[7][0]==18){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
 					makeMove(7,4,7,3,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,1,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						makeMove(7,4,7,2,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,1,ENPASSANT_ENABLED)){
-							int[][] tempArrMove3 = ArrayOps.copyArr(inArr);
+							int[][] tempArrMove3 = ArrayOps.copyArr8(inArr);
 							makeMove(7,4,7,1,tempArrMove3);
 							if (!ChessOps.kingChecked(tempArrMove3,1,ENPASSANT_ENABLED)){
 								out[7][2]=4;
@@ -521,14 +551,14 @@ public class ChessGUI{
 			
 			//BLACK CASTLE QUEENSIDE
 			if(inArr[r][c]==29&&inArr[0][3]==0&&inArr[0][2]==0&&inArr[0][1]==0&&inArr[0][0]==28){
-				int[][] tempArrMove = ArrayOps.copyArr(inArr);
+				int[][] tempArrMove = ArrayOps.copyArr8(inArr);
 				if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
 					makeMove(0,4,0,3,tempArrMove);
 					if (!ChessOps.kingChecked(tempArrMove,2,ENPASSANT_ENABLED)){
-						int[][] tempArrMove2 = ArrayOps.copyArr(inArr);
+						int[][] tempArrMove2 = ArrayOps.copyArr8(inArr);
 						makeMove(0,4,0,2,tempArrMove2);
 						if (!ChessOps.kingChecked(tempArrMove2,2,ENPASSANT_ENABLED)){
-							int[][] tempArrMove3 = ArrayOps.copyArr(inArr);
+							int[][] tempArrMove3 = ArrayOps.copyArr8(inArr);
 							makeMove(0,4,0,1,tempArrMove3);
 							if (!ChessOps.kingChecked(tempArrMove3,2,ENPASSANT_ENABLED)){
 								out[0][2]=5;
@@ -541,7 +571,7 @@ public class ChessGUI{
     	for(int i=0; i<8; i++){
         	for(int j=0; j<8; j++){
         		if(out[i][j]==1){
-        			int[][] tempArrMove = ArrayOps.copyArr(inArr);
+        			int[][] tempArrMove = ArrayOps.copyArr8(inArr);
         			makeMove(r,c,i,j,tempArrMove);
         			if (ChessOps.kingChecked(tempArrMove,(inArr[r][c]/10),ENPASSANT_ENABLED)){
         				out[i][j]=0;
@@ -613,14 +643,14 @@ public class ChessGUI{
     	
     	if(boardArr[i2][j2]==11&&i1==6&&i2==4){
     		boardArr[i2][j2]=17;
-    	} else if(boardArr[i2][j2]==21&&i1==1&&i2==5){
-    		boardArr[i2][j2]=17;
+    	} else if(boardArr[i2][j2]==21&&i1==1&&i2==3){
+    		boardArr[i2][j2]=27;
     	}
-    	if(boardArr[i2][j2]==11&&j1-j2!=0&&boardArr[i2+1][j2]%10==7){
+    	if(boardArr[i2][j2]==11&&j1-j2!=0&&!captureBool){//boardArr[i2+1][j2]%10==7){
     		boardArr[i2+1][j2]=0;
     		//moveStr+="e.p.";
     	}
-    	if(boardArr[i2][j2]==21&&j1-j2!=0&&boardArr[i2+1][j2]%10==7){
+    	if(boardArr[i2][j2]==21&&j1-j2!=0&&!captureBool){//boardArr[i2+1][j2]%10==7){
     		boardArr[i2-1][j2]=0;
     		//moveStr+="e.p.";
     	}
@@ -641,5 +671,6 @@ public class ChessGUI{
     		turnCount++;
     		turnStr="";
     	}
+    	//ArrayOps.print8x8(board);
     }
 }
