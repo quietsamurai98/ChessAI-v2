@@ -31,7 +31,7 @@ import javax.imageio.ImageIO;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 public class ChessGUI{
-	int depth = 1;
+	int depth = 3;
 	JFrame chessInterface;
     JPanel boardPanel;
     JLabel squaresPanels[][];
@@ -53,7 +53,7 @@ public class ChessGUI{
     int lastJ;
     boolean checkmate;
     boolean gameOver;
-    int currentSide;
+    int currentSide=0;
     int[] coords = new int[4];
 	String[] pieceStrArr = {"","","N","B","R","Q","K","","R","K"};
 	String[] colStr = {"a","b","c","d","e","f","g","h"};
@@ -114,7 +114,7 @@ public class ChessGUI{
         ChessGUI gui=new ChessGUI(false,true);
     }
     public ChessGUI(boolean whiteIsAI, boolean blackIsAI) {
-    	currentSide=3;
+    	currentSide=1;
     	WHITE_AI=whiteIsAI;
     	BLACK_AI=blackIsAI;
     	loadImages();
@@ -127,7 +127,7 @@ public class ChessGUI{
         	lastI=0;
         	lastJ=0;
         	checkmate=false;
-        	int[] coords = ChessAI.aiMiniMax(board,1,depth);
+        	int[] coords = aiFindMove(board,1,depth);
 			if(coords[3]==-1){
 				System.out.println("Black wins!");
 				checkmate=true;
@@ -258,7 +258,7 @@ public class ChessGUI{
         JPanel depthPanel = new JPanel();
         JLabel depthLabel = new JLabel("AI Search Depth:");
         
-        SpinnerModel depthModel = new SpinnerNumberModel(3, 1, 10000, 1);
+        SpinnerModel depthModel = new SpinnerNumberModel(depth, 1, 10000, 1);
         depthSpinner = new JSpinner(depthModel);
         depthSpinner.addChangeListener(new ChangeListener(){
         	public void stateChanged(ChangeEvent e){
@@ -306,15 +306,13 @@ public class ChessGUI{
         	guiPrintLine("Welcome! You are now watching a debug chess match between two AIs.");
         	guiPrintLine("This mode is experimental! Use the task manager to close the game.");
         }
-        setDepth(3);
+        setDepth(depth);
         updatePieceDisplay();
         textScroll.paintImmediately(new Rectangle(new Point(0,0),textScroll.getSize()));
         newGameButtons.paintImmediately(new Rectangle(new Point(0,0),newGameButtons.getSize()));
         updatePieceDisplay();
         textScroll.paintImmediately(new Rectangle(new Point(0,0),textScroll.getSize()));
         newGameButtons.paintImmediately(new Rectangle(new Point(0,0),newGameButtons.getSize()));
-        
-        
         
         chessInterface.setVisible(true);
     }
@@ -360,19 +358,19 @@ public class ChessGUI{
 				    highlightMoves(new int[8][8]);
 		    		updatePieceDisplay();
 		    		currentSide=currentSide%2+1;
-		    		if(ChessAI.aiMiniMax(board,1,1)[3]==-1){
+		    		if(aiFindMove(board,1,1)[3]==-1){
 		    			guiPrintLine("Black wins!");
 		    			checkmate=true;
 		    		}
-		    		if(ChessAI.aiMiniMax(board,2,1)[3]==-1){
+		    		if(aiFindMove(board,2,1)[3]==-1){
 		    			guiPrintLine("White wins!");
 		    			checkmate=true;
 		    		}
 		    		
 		    		
 		    		if(WHITE_AI||BLACK_AI){
-			    		int[] coords = ChessAI.aiMiniMax(board,currentSide,depth);
-		    			
+			    		int[] coords = aiFindMove(board,currentSide,depth);
+		    			currentSide=currentSide%2+1;
 		    			if(coords[3]==-1){
 		    				if(WHITE_AI){
 		    					guiPrintLine("Black wins!");
@@ -388,7 +386,7 @@ public class ChessGUI{
 			    			printMove(makeMove(coords[0],coords[1],coords[2],coords[3],board));
 						}
 			    		updatePieceDisplay();
-			    		currentSide=currentSide%2+1;
+			    		
 		    		}
 	    		} else {
 	    			highlightMoves(new int[8][8]);
@@ -399,7 +397,7 @@ public class ChessGUI{
     private void aiMoveClick(){
     	if(!checkmate){
 			highlightMoves(new int[8][8]);
-			coords = ChessAI.aiMiniMax(board,currentSide,depth);
+			coords = aiFindMove(board,currentSide,depth);
 			if(coords[3]==-1){
 				if(WHITE_AI){
 					guiPrintLine("White wins!");
@@ -419,7 +417,7 @@ public class ChessGUI{
 			currentSide=currentSide%2+1;
 		
 			if(WHITE_AI||BLACK_AI){
-				coords = ChessAI.aiMiniMax(board,currentSide,depth);
+				coords = aiFindMove(board,currentSide,depth);
 				
 				if(coords[3]==-1){
 					if(WHITE_AI){
@@ -672,5 +670,9 @@ public class ChessGUI{
     		turnStr="";
     	}
     	//ArrayOps.print8x8(board);
+    }
+    private int[] aiFindMove(int[][] board, int inSide, int inDepth){
+    	//return ChessAI.aiMiniMax(board,side,inDepth);
+    	return ChessAI.aiAlphaBeta(board,inSide,inDepth,-Integer.MAX_VALUE,Integer.MAX_VALUE);
     }
 }

@@ -10,6 +10,7 @@ import java.util.*;
 public abstract class ChessAI {
 	private static boolean ENPASSANT_ENABLED = true;
 	private static boolean CASTLING_ENABLED = true;
+	private static int oo = Integer.MAX_VALUE;
 
     public ChessAI() {
     }
@@ -103,6 +104,57 @@ public abstract class ChessAI {
 			
 		}
     }
+    
+    public static int[] aiAlphaBeta(int[][] PARAMETER_ARRAY, int side, int searchDepth, int alpha, int beta){
+    	int[][] board=ArrayOps.copyArr8(PARAMETER_ARRAY);
+    	if (testGameOver(board)||searchDepth==0){
+    		int[] out={-1,-1,-1,-1,(3-2*side)*getScore(board)};
+    		return out;
+    	}
+    	
+    	//Generate legal moves
+    	ArrayList<int[]> moves = new ArrayList<int[]>();
+    	for(int r=0;r<8;r++){
+    		for(int c=0;c<8;c++){
+    			if(board[r][c]/10==side){
+    				int[][] legalMoveArr = legalMoves(r,c,board);
+    				for(int r2=0;r2<8;r2++){
+    					for(int c2=0;c2<8;c2++){
+    						if(legalMoveArr[r2][c2]!=0){
+    							int[] moveItem = {r,c,r2,c2};
+    							moves.add(moveItem);
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	int[] max = {0,0,0,0,-oo};
+    	Collections.shuffle(moves);
+    	for(int[] move:moves){
+    		int[][] tempBoard=ArrayOps.copyArr8(PARAMETER_ARRAY);
+    		
+    		int x = -1 * aiAlphaBeta(makeMove(move,tempBoard),side%2+1,searchDepth-1,-beta,-alpha)[4];
+    		if(x>max[4]){
+    			for(int i=0;i<4;i++){
+    				max[i]=move[i];
+    			}
+    			max[4]=x;
+    		}
+    		if(x>alpha){
+    			alpha=x;
+    		}
+    		if(alpha>=beta){
+    			int[] out = {move[0],move[1],move[2],move[3],alpha};
+    			return out;
+    		}
+    	}
+    	
+    	int[] out = {max[0],max[1],max[2],max[3],alpha};
+    	return out;
+    }
+    
     private static int getMoveScore(int[] move, int[][] PARAMETER_ARRAY){
     	int[][] arr = ArrayOps.copyArr8(PARAMETER_ARRAY);
     	arr=makeMove(move, arr);
